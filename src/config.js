@@ -1,0 +1,79 @@
+const config = {
+  BASE_URL: "https://analytics.flolio.com",
+  API_FILTER_PATH: {
+    breakdown: "/api/v1//stats/breakdown",
+    aggregate: "/api/v1//stats/aggregate",
+  },
+  TOKEN: "pC2jSWFU4NV7ZkHJ78y84hd4BvRvzfQ4Qcc4wAK1hX_UuNVnJdZMAEMvWkKMJ6SX",
+  SITE_ID: "exceed.story-demo.ogn-review.net",
+  PERIOD: "6mo",
+  EVENT_METRICS: "visitors,events",
+  PAGE_VIEW_METRICS: "visitors,pageviews",
+  DATA_LIMIT: 5,
+  EVENTS: {
+    mint_click: "Mint Click",
+    minted: "Minted",
+    connect_wallet: "Connect Wallet",
+    buy_now_click: "Buy Now Click",
+    purchased: "Purchased",
+  },
+  QUERY_PARAMS: {
+    conversion_rate: {
+      apiType: "breakdown",
+      body: {
+        property: "visit:source",
+        metric: "conversions",
+      },
+    },
+    top_pages: {
+      apiType: "breakdown",
+      body: {
+        property: "event:page",
+      },
+    },
+    top_countries: {
+      apiType: "breakdown",
+      body: {
+        property: "visit:country",
+      },
+    },
+    bounce_rate: {
+      apiType: "breakdown",
+      body: {
+        property: "visit:country",
+        metrics: "bounce_rate",
+      },
+    },
+    top_referrer: {
+      apiType: "breakdown",
+      body: {
+        // property:"event:name"
+      },
+    },
+    top_utms: {
+      apiType: "breakdown",
+      body: {
+        property: "visit:utm_source",
+      },
+    },
+    pageviews: {
+      apiType: "aggregate",
+      body: {
+        metrics: "pageviews",
+      },
+    },
+    visitors: {
+      apiType: "aggregate",
+      body: {
+        metrics: "visitors",
+      },
+    },
+    devices: {
+      apiType: "breakdown",
+      body: {
+        property: "devices",
+      },
+    },
+  },
+};
+export default config;
