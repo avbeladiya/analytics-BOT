@@ -8,7 +8,7 @@ export function App() {
   const [showBOT, setShowBOT] = useState(false);
   return (
     <>
-      <div class="">
+      <div>
         {showBOT ? (
           <div
             style={{

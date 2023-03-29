@@ -1,15 +1,16 @@
 const config = {
-  BASE_URL: "https://analytics.flolio.com",
-  API_FILTER_PATH: {
-    breakdown: "/api/v1//stats/breakdown",
-    aggregate: "/api/v1//stats/aggregate",
-  },
-  TOKEN: "pC2jSWFU4NV7ZkHJ78y84hd4BvRvzfQ4Qcc4wAK1hX_UuNVnJdZMAEMvWkKMJ6SX",
-  SITE_ID: "exceed.story-demo.ogn-review.net",
+  // BASE_URL: "https://analytics.flolio.com",
+  // TOKEN: "pC2jSWFU4NV7ZkHJ78y84hd4BvRvzfQ4Qcc4wAK1hX_UuNVnJdZMAEMvWkKMJ6SX",
+  // SITE_ID: "exceed.story-demo.ogn-review.net",
   PERIOD: "6mo",
   EVENT_METRICS: "visitors,events",
   PAGE_VIEW_METRICS: "visitors,pageviews",
   DATA_LIMIT: 5,
+  API_FILTER_PATH: {
+    breakdown: "/api/v1//stats/breakdown",
+    aggregate: "/api/v1//stats/aggregate",
+  },
+  ...window.BOT_CONFIG,
   EVENTS: {
     mint_click: "Mint Click",
     minted: "Minted",
