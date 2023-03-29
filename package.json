@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@chatscope/chat-ui-kit-react": "^1.10.1",
-    "preact": "^10.13.0"
+    "preact": "^10.13.0",
+    "vite-plugin-css-injected-by-js": "^3.1.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",

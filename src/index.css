@@ -67,3 +67,88 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.action {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  width: 150px;
+  height: 150px;
+  background-color: transparent !important;
+  border-radius: 50%;
+  /* box-shadow: 0 5px 5px rgba(0,0,0,0.1); */
+}
+
+@media (min-width: 2560px) {
+  .action {
+    height: 250px;
+    width: 250px;
+  }
+}
+
+.action #widget-toggle-button {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0;
+  border-radius: 50%;
+  background-color: transparent !important;
+  font-size: 40px;
+  /* transition: 0.3s ease-in-out; */
+  outline: none;
+  cursor: pointer;
+}
+
+.action #banner {
+  width: 100%;
+  height: 100%;
+}
+
+.action.active #banner {
+  margin-top: 85px;
+  margin-left: 16px;
+  width: 50px;
+  height: 50px;
+}
+
+@media (min-width: 2560px) {
+  .action.active #banner {
+    margin-top: 185px;
+  }
+}
+
+.action section {
+  position: absolute;
+  bottom: 55px;
+  background-color: #fff;
+  min-width: 200px;
+  max-width: 400px;
+  display: grid;
+  grid-gap: 10px;
+  border-radius: 20px;
+  padding: 20px;
+  list-style-type: none;
+  margin: 0;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s;
+  z-index: 999999999999;
+}
+
+.action ul {
+  display: inline-flex;
+  margin-bottom: 20px;
+}
+
+.action li {
+  margin: 10px;
+}
+
+.action.active section {
+  opacity: 1;
+  visibility: visible;
+  transition: 0.3s;
+  bottom: 65px;
+}

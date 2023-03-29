@@ -71,7 +71,7 @@ const config = {
     devices: {
       apiType: "breakdown",
       body: {
-        property: "devices",
+        property: "visit:device",
       },
     },
   },
