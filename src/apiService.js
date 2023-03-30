@@ -30,20 +30,3 @@ const api = {
 };
 
 export default api;
-
-// requestedData;
-
-// - aggregate
-// - "Conversion Rate" => conversions => metric => breakdown
-// - breakdown;
-// - "Top Pages"
-// - "Top Countries";
-// Bounce Rate
-// Top Referrer
-// Top UTMs
-// Pageviews
-// Visitors
-// Devices
-
-// filter;
-// period;

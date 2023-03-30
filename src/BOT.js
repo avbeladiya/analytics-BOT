@@ -9,8 +9,13 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 import { useState } from "preact/hooks";
 import config from "./config";
-import { buildAPIQuery, formatResp, parseUserMessage } from "./utils";
+import {
+  buildAPIQuery,
+  renderBreakdownResult,
+  renderAggregateResult,
+} from "./utils";
 import api from "./apiService";
+import { parseUserStringService } from "./openaiService";
 
 const MY_BOT = () => {
   const [inputMessage, setInputMessage] = useState("");
@@ -26,74 +31,89 @@ const MY_BOT = () => {
   ]);
 
   async function parseUserMessageFromInput(userMessage, msgStack) {
-    try {
-      const extractedParams = await parseUserMessage(userMessage);
-      // console.log({ extractedParams });
-      let body = {};
+    // const extractedParams = await parseUserMessage(userMessage);
 
-      if (extractedParams.query) {
-        body = {
-          ...config.QUERY_PARAMS[extractedParams.query].body,
-        };
-      }
+    const extractedBody = await parseUserStringService(
+      config.OPEN_API_KEY,
+      userMessage
+    );
+    console.log({ extractedBody });
 
-      if (extractedParams.duration) {
-        body = {
-          ...body,
-          period: "custom",
-          date: `${extractedParams.duration.startDate},${extractedParams.duration.endDate}`,
-        };
-      } else {
-        body = { ...body, period: "6mo" };
-      }
+    let body =
+      extractedBody.apiType === "aggregate"
+        ? {
+            duration: extractedBody.duration,
+            filters: extractedBody.filters,
+            metric: extractedBody.metric,
+          }
+        : {
+            duration: extractedBody.duration,
+            metric: extractedBody.metric,
+            property: extractedBody.property.split("=")[0],
+          };
+    console.log({ body });
+    // if (extractedParams.query) {
+    //   body = {
+    //     ...config.QUERY_PARAMS[extractedParams.query].body,
+    //   };
+    // }
 
-      if (extractedParams.filter) {
-        const filterEvent = config.EVENTS[extractedParams.filter];
-        body = {
-          ...body,
-          metrics: body.metrics ? body.metrics + ",events" : "events",
-          "event:name": filterEvent,
-        };
-      }
+    // if (extractedParams.duration) {
+    //   body = {
+    //     ...body,
+    //     period: "custom",
+    //     date: `${extractedParams.duration.startDate},${extractedParams.duration.endDate}`,
+    //   };
+    // } else {
+    //   body = { ...body, period: "6mo" };
+    // }
 
-      if (!Object.keys(body).length) {
-        showSuggestionMsg(null, msgStack);
-        return;
-      }
+    // if (extractedParams.filter) {
+    //   const filterEvent = config.EVENTS[extractedParams.filter];
+    //   body = {
+    //     ...body,
+    //     metrics: body.metrics ? body.metrics + ",events" : "events",
+    //     "event:name": filterEvent,
+    //   };
+    // }
 
-      const urlPath = extractedParams?.query
-        ? config.API_FILTER_PATH[
-            config.QUERY_PARAMS[extractedParams?.query].apiType
-          ]
-        : null;
-
-      const res = await getAPIData(urlPath, body);
-      if (!res.results) {
-        showSuggestionMsg(null, msgStack);
-        return;
-      }
-
-      const formateResp = formatResp(extractedParams.query, res.results);
-      console.log({ formateResp });
-      setMessageStack([
-        ...msgStack,
-        {
-          message: formateResp,
-          sender: "Flolio",
-          sentTime: new Date().toString(),
-          direction: "incoming",
-          position: "single",
-          showInHTML: true,
-        },
-      ]);
-      setShowTypingIndicator(false);
-    } catch (error) {
-      showSuggestionMsg(
-        "Hello! If you're looking for event analytics stats, I can help. Just provide the details in the following format: `Give me [metric] for [event] in the last [time period].` For example, you can ask `Give me the conversion rate for mint events in the last 7 days.`",
-        msgStack
-      );
-      setShowTypingIndicator(false);
+    if (!Object.keys(body).length) {
+      showSuggestionMsg(null, msgStack);
+      return;
     }
+
+    // const urlPath = extractedParams?.query
+    //   ? config.API_FILTER_PATH[
+    //       config.QUERY_PARAMS[extractedParams?.query].apiType
+    //     ]
+    //   : null;
+
+    const urlPath = config.API_FILTER_PATH[extractedBody.apiType];
+
+    const res = await getAPIData(urlPath, body);
+    if (!res.results) {
+      showSuggestionMsg(null, msgStack);
+      return;
+    }
+    console.log({ res });
+    const formateResp =
+      extractedBody.apiType === "breakdown"
+        ? renderBreakdownResult(res)
+        : renderAggregateResult(res);
+
+    console.log({ formateResp });
+    setMessageStack([
+      ...msgStack,
+      {
+        message: formateResp,
+        sender: "Flolio",
+        sentTime: new Date().toString(),
+        direction: "incoming",
+        position: "single",
+        showInHTML: true,
+      },
+    ]);
+    setShowTypingIndicator(false);
   }
 
   async function getAPIData(urlPath, body) {
@@ -124,14 +144,12 @@ const MY_BOT = () => {
           <MessageList>
             {messageStack.map((item) => {
               if (item.showInHTML) {
-                let res = item?.message
-                  ?.map((msg) => `${msg.key} - ${msg.value}`)
-                  .join("\n");
-
-                let msg = res;
                 return (
                   <Message model={{ ...item }}>
-                    <Message.HtmlContent model={{ ...item }} html={msg} />
+                    <Message.HtmlContent
+                      model={{ ...item }}
+                      html={item?.message}
+                    />
                   </Message>
                 );
               } else return <Message model={{ ...item }} />;
@@ -148,6 +166,7 @@ const MY_BOT = () => {
             }}
             onSend={(val) => {
               setShowTypingIndicator(true);
+              console.log({ val });
               const msgStack = [
                 ...messageStack,
                 {

@@ -2,7 +2,10 @@ import config from "./config";
 export function formatResp(apiType, data) {
   switch (apiType) {
     case "conversion_rate":
-      return data.map((item) => ({ key: item.source, value: item.events }));
+      return data.map((item) => ({
+        key: item.source,
+        value: item.events ? item.events : item.visitors,
+      }));
     case "top_pages":
       return data.map((item) => ({ key: item.page, value: item.events }));
     case "top_countries":
@@ -189,4 +192,20 @@ export function stringifyObjectArray(arr) {
     result = "";
   }
   return result;
+}
+
+export function renderBreakdownResult(odata) {
+  let data = { ...odata };
+  return data.results
+    .map((ro) => {
+      let roKey = [...Object.entries(ro)[0]][1];
+      let roVal = [...Object.entries(ro)[1]][1];
+
+      return `${roKey} - ${roVal}`;
+    })
+    .join("\n");
+}
+export function renderAggregateResult(data) {
+  const ro = Object.entries(data.results);
+  return `${ro[0]} - ${ro[1].value}`;
 }
