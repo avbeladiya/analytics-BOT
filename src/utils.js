@@ -61,11 +61,11 @@ export const getQueryPart = (message) => {
     top_pages: /((top)?\s?pages\s?(count)?)/i,
     top_countries: /((top)?\s?countries\s?(count)?)/i,
     bounce_rate: /bounce rate/i,
-    top_referrer: /top referrers?/i,
-    top_utms: /top utms/i,
-    pageviews: /pageviews/i,
-    visitors: /visitors/i,
-    devices: /devices/i,
+    top_referrer: /referrers?/i,
+    top_utms: /utms/i, // 
+    pageviews: /pageviews|traffic|/i,
+    visitors: /visitors?/i,
+    devices: /devices?/i,
   };
 
   for (let pType in queryRegexes) {
@@ -205,7 +205,10 @@ export function renderBreakdownResult(odata) {
     })
     .join("\n");
 }
-export function renderAggregateResult(data) {
+export function renderAggregateResult(odata) {
+  let data = {...odata}
+  console.log("🚀 ~ file: utils.js:210 ~ renderAggregateResult ~ data:", data)
   const ro = Object.entries(data.results);
+  console.log("🚀 ~ file: utils.js:212 ~ renderAggregateResult ~ ro:", ro)
   return `${ro[0]} - ${ro[1].value}`;
 }

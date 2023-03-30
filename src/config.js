@@ -1,8 +1,8 @@
 const config = {
-  // BASE_URL: "https://phantom.flolio.com",
-  // TOKEN: "pC2jSWFU4NV7ZkHJ78y84hd4BvRvzfQ4Qcc4wAK1hX_UuNVnJdZMAEMvWkKMJ6SX",
-  // SITE_ID: "exceed.story-demo.ogn-review.net",
-  // OPEN_API_KEY: "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",
+  BASE_URL: "https://phantom.flolio.com",
+  TOKEN: "pC2jSWFU4NV7ZkHJ78y84hd4BvRvzfQ4Qcc4wAK1hX_UuNVnJdZMAEMvWkKMJ6SX",
+  SITE_ID: "exceed.story-demo.ogn-review.net",
+  OPEN_API_KEY: "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",
   PERIOD: "6mo",
   EVENT_METRICS: "visitors,events",
   PAGE_VIEW_METRICS: "visitors,pageviews",
