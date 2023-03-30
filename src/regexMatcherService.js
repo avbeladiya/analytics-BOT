@@ -28,33 +28,33 @@ const propertiesMap = {
   city: 'visit:city',
 }
 const dataTypeRegexes = {
-  // Lists or Breakdowns available
-  event_list: /events|goals|events? (list)|goals? (list)/i,
-  page_list: /pages? (list)?/i,
-  source_list: /sources? (list)?/i,
-  referrer_list: /referrers? (list)?/i,
-  utm_medium_list: /mediums (list)?/i,
-  utm_source_list: /utm sources (list)?/i,
-  utm_campaign_list: /(utm )?campaigns (list)?/i,
-  device_list: /devices? (list)?/i,
-  browser_list: /browsers? (list)?/i,
-  os_list: /(os|operating systems?) (list)?/i,
-  country_list: /countr(y|ies) (list)?/i,
-  region_list: /regions/i,
-  city_list: /cities/i,
-
-  // Custom List or breakdown
-  // event_conversions_list: /conversion rates|success rates|conversions? list/i,
-
   // Counts or aggregates
-  visitors_count: /(unique )?(number |count )?(of )?(unique )?(visitors|users)( count)?/i,
-  visits_count: /(number |count )?(of )?(visits|impressions|traffic|hits)( count)?/i,
-  pageviews_count: /(number |count )?(of )?(page )?(views)( count)?/i,
-  bounce_rate_count: /(number |count )?(of )?(bounce)( count)?/i,
-  events_count: /(number |count )?(of )?(events|goals)( count)?/i,
+  visitors_count: /(visitors? count|(count|number) of visitors)/i,
+  visits_count: /((visit|impression)s? count|(count|number) of (visit|impression)s?)/i,
+  pageviews_count: /((page view)s? count|(count|number) of (page view)s?)/i,
+  bounce_rate_count: /((bounce)s? count|(count|number) of (bounce)s?)/i,
+  events_count: /((event)s? count|(count|number) of (event)s?)/i,
 
   // Custom Count or aggregates
   // conversion_rate: /conversions/i
+
+  // Lists or Breakdowns available
+  event_list: /(list of (events|goals))|((events|goals) list)/i,
+  page_list: /(list of pages?)|(pages? list)/i,
+  source_list: /(list of sources?)|(sources? list)/i,
+  referrer_list: /(list of referrers?)|(referrers? list)/i,
+  utm_medium_list: /(list of mediums?)|(mediums? list)/i,
+  utm_source_list: /(list of utm sources?)|(utm sources? list)/i,
+  utm_campaign_list: /(list of campaigns?)|(campaigns? list)/i,
+  device_list: /(list of devices?)|(devices? list)/i,
+  browser_list: /(list of browsers?)|(browsers? list)/i,
+  os_list: /(list of (os|operating systems?))|((os|operating systems?) list)/i,
+  country_list: /(list of countr(y|ies))|(countr(y|ies) list)/i,
+  region_list: /(list of regions?)|(regions? list)/i,
+  city_list: /(list of citys?)|(citys? list)/i,
+
+  // Custom List or breakdown
+  // event_conversions_list: /conversion rates|success rates|conversions? list/i,
 }
 
 const metricFilterRegexes = {
@@ -248,6 +248,8 @@ export const parseUserStringFromRegexService = async (userMessage) => {
   return reqBody;
 };
 
+// parseUserStringFromRegexService('What were the page view count from twitter source')
+parseUserStringFromRegexService('list of events')
 // parseUserStringFromRegexService('give me visitors count for Minted events')
 // parseUserStringFromRegexService('what was traffic in last week')
 // parseUserStringFromRegexService('what is traffic in this week')

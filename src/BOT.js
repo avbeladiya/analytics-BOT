@@ -16,6 +16,7 @@ import {
 } from "./utils";
 import api from "./apiService";
 import { parseUserStringService } from "./openaiService";
+import { parseUserStringFromRegexService } from "./regexMatcherService";
 
 const MY_BOT = () => {
   const [inputMessage, setInputMessage] = useState("");
@@ -33,11 +34,10 @@ const MY_BOT = () => {
   async function parseUserMessageFromInput(userMessage, msgStack) {
     // const extractedParams = await parseUserMessage(userMessage);
 
-    const extractedBody = await parseUserStringService(
-      config.OPEN_API_KEY,
+    const extractedBody = await parseUserStringFromRegexService(
       userMessage
     );
-    console.log({ extractedBody });
+    console.log("🚀 ~ file: BOT.js:40 ~ parseUserMessageFromInput ~ extractedBody:", extractedBody)
 
     let body =
       extractedBody.apiType === "aggregate"
@@ -49,44 +49,14 @@ const MY_BOT = () => {
         : {
             duration: extractedBody.duration,
             metric: extractedBody.metric,
-            property: extractedBody.property.split("=")[0],
+            property: extractedBody.property,
+            filters: extractedBody.filters,
           };
-    console.log({ body });
-    // if (extractedParams.query) {
-    //   body = {
-    //     ...config.QUERY_PARAMS[extractedParams.query].body,
-    //   };
-    // }
-
-    // if (extractedParams.duration) {
-    //   body = {
-    //     ...body,
-    //     period: "custom",
-    //     date: `${extractedParams.duration.startDate},${extractedParams.duration.endDate}`,
-    //   };
-    // } else {
-    //   body = { ...body, period: "6mo" };
-    // }
-
-    // if (extractedParams.filter) {
-    //   const filterEvent = config.EVENTS[extractedParams.filter];
-    //   body = {
-    //     ...body,
-    //     metrics: body.metrics ? body.metrics + ",events" : "events",
-    //     "event:name": filterEvent,
-    //   };
-    // }
 
     if (!Object.keys(body).length) {
       showSuggestionMsg(null, msgStack);
       return;
     }
-
-    // const urlPath = extractedParams?.query
-    //   ? config.API_FILTER_PATH[
-    //       config.QUERY_PARAMS[extractedParams?.query].apiType
-    //     ]
-    //   : null;
 
     const urlPath = config.API_FILTER_PATH[extractedBody.apiType];
 
@@ -95,13 +65,12 @@ const MY_BOT = () => {
       showSuggestionMsg(null, msgStack);
       return;
     }
-    console.log({ res });
+
     const formateResp =
       extractedBody.apiType === "breakdown"
         ? renderBreakdownResult(res)
         : renderAggregateResult(res);
 
-    console.log({ formateResp });
     setMessageStack([
       ...msgStack,
       {
