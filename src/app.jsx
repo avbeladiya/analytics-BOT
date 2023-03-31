@@ -21,8 +21,8 @@ export function App() {
               style={{
                 alignSelf: "end",
                 position: "absolute",
-                top: "-30px",
-                right: "0px",
+                bottom: "-50px",
+                right: "-70px",
                 backgroundColor: "#fff",
                 borderColor: "#000",
               }}
@@ -37,6 +37,7 @@ export function App() {
         <div class="action">
           <div class="font-bold absolute bottom-10 left-10 action-container">
             <button
+              style={{color: "#fff"}}
               id="widget-toggle-button"
               onClick={() => setShowBOT(!showBOT)}
             >
@@ -52,6 +53,7 @@ export function App() {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  style="height: 28px; width: 28px;"
                 />
               </svg>
             </button>

@@ -39,7 +39,7 @@ const dataTypeRegexes = {
   // conversion_rate: /conversions/i
 
   // Lists or Breakdowns available
-  event_list: /(list of (top |best )?(events|goals))|((conversions?|events|goals) list)/i,
+  event_list: /(list of (top |best )?(conversions|events|goals))|((conversions?|events|goals) list)/i,
   page_list: /(list of (top |best )?pages?)|(pages? list)/i,
   source_list: /(list of (top |best )?sources?)|(sources? list)/i,
   referrer_list: /(list of (top |best )?referrers?)|(referrers? list)/i,

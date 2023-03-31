@@ -68,12 +68,10 @@ button:focus-visible {
   background-color: #fff;
 }
 .action-container {
-  border: 3px solid black;
-  border-radius: 9999px;
-  padding-left: 20px;
-  padding-right: 20px;
-  background-color: white;
-  box-shadow: 1px 1px 10px;
+    border-radius: 9999px;
+    background-color: #3f51ab;
+    box-shadow: 0.5px 0.5px 6px;
+    padding: 13px 16px;
 }
 
 .action #banner {
