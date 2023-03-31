@@ -17,20 +17,6 @@ export function App() {
               bottom: "150px",
             }}
           >
-            <button
-              style={{
-                alignSelf: "end",
-                position: "absolute",
-                bottom: "-50px",
-                right: "-70px",
-                backgroundColor: "#fff",
-                borderColor: "#000",
-              }}
-              id="widget-toggle-button"
-              onClick={() => setShowBOT(!showBOT)}
-            >
-              X
-            </button>
             <MY_BOT setShowBOT={setShowBOT} showBOT={showBOT} />
           </div>
         ) : null}
