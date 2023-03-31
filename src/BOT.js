@@ -47,10 +47,10 @@ const MY_BOT = () => {
       extractedBody.apiType === "aggregate"
         ? {
             filters: extractedBody.filters,
-            metric: extractedBody.metric,
+            metrics: extractedBody.metric,
           }
         : {
-            metric: extractedBody.metric,
+            metrics: extractedBody.metric,
             property: extractedBody.property,
             filters: extractedBody.filters,
           };
