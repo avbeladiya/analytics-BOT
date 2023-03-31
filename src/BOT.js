@@ -36,6 +36,7 @@ const MY_BOT = () => {
     const extractedBody = await parseUserStringFromRegexService(
       userMessage
     );
+    console.log("🚀 ~ file: BOT.js:39 ~ parseUserMessageFromInput ~ extractedBody:", extractedBody)
 
     if (!Object.keys(extractedBody).length) {
       showSuggestionMsg(null, msgStack);
@@ -45,16 +46,21 @@ const MY_BOT = () => {
     let body =
       extractedBody.apiType === "aggregate"
         ? {
-            duration: extractedBody.duration,
             filters: extractedBody.filters,
             metric: extractedBody.metric,
           }
         : {
-            duration: extractedBody.duration,
             metric: extractedBody.metric,
             property: extractedBody.property,
             filters: extractedBody.filters,
           };
+
+      if(extractedBody.duration == '6mo') {
+        body['duration'] = extractedBody.duration
+      } else {
+        body['period'] = 'custom'
+        body['date'] =  extractedBody.duration
+      }
 
     if (!Object.keys(body).length) {
       showSuggestionMsg(null, msgStack);

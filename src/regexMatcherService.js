@@ -1,6 +1,6 @@
 const eventMap = {
   buy_now_click: 'Buy Now Click',
-  mint_click:'Mint Click',
+  mint_click: 'Mint Click',
   connect_wallet: 'Connect Wallet',
   purchased: 'Purchased',
   minted: 'Minted',
@@ -27,48 +27,30 @@ const propertiesMap = {
   region: 'visit:region',
   city: 'visit:city',
 }
-const dataTypeRegexes = {
-  // Counts or aggregates
-  visitors_count: /(visitors? count|(count|number) of visitors|many (people |users )?visit(s|ed))/i,
-  visits_count: /((visit|impression)s? count|(count|number) of (visit|impression)s?)/i,
-  pageviews_count: /((page view)s? count|(count|number) of (page view)s?)/i,
-  bounce_rate_count: /((bounce)s? count|(count|number) of (bounce)s?)/i,
-  events_count: /((event)s? count|(count|number) of (event)s?|how many)/i,
 
-  // Custom Count or aggregates
-  // conversion_rate: /conversions/i
-
-  // Lists or Breakdowns available
-  event_list: /(list of (top |best )?(conversions|events|goals))|((conversions?|events|goals) list)/i,
-  page_list: /(list of (top |best )?pages?)|(pages? list)/i,
-  source_list: /(list of (top |best )?sources?)|(sources? list)/i,
-  referrer_list: /(list of (top |best )?referrers?)|(referrers? list)/i,
-  utm_medium_list: /(list of (top |best )?mediums?)|(mediums? list)/i,
-  utm_source_list: /(list of (top |best )?utm sources?)|(utm sources? list)/i,
-  utm_campaign_list: /(list of (top |best )?campaigns?)|(campaigns? list)/i,
-  device_list: /(list of (top |best )?devices?)|(devices? list)/i,
-  browser_list: /(list of (top |best )?browsers?)|(browsers? list)/i,
-  os_list: /(list of (top |best )?(os|operating systems?))|((os|operating systems?) list)/i,
-  country_list: /(list of (top |best )?countr(y|ies))|(countr(y|ies) list)/i,
-  region_list: /(list of (top |best )?regions?)|(regions? list)/i,
-  city_list: /(list of (top |best )?citys?)|(citys? list)/i,
+const listTypeRegex = /(list|top|best)/i
+const aggregateRegex = {
+  visitors: /(visitors?|people|users|visited)/i,
+  visits: /(visit|impression)s?/i,
+  pageviews: /((page\s?view)s?)/i,
+  bounce_rate: /(bounce|bounce rate)/i,
+}
+const listRegex = {
+  event: /(conversions|events|goals)/i,
+  page: /(pages|url)/i,
+  source: /sources/i,
+  referrer: /(referr?ers?|referr?al|referr?er)/i,
+  utm_medium: /medium/i,
+  utm_source: /utm source/i,
+  utm_campaign: /campaign/i,
+  browser: /browser/i,
+  os: /(\bos\b|operating system)/i,
+  country: /(countr(y|ies))/i,
 }
 
+const haveMetricFilterRegex = /\b(from|for)\b/i
 const metricFilterRegexes = {
-  event: /(of|from|for)(?<fp>(.+?))(conversion( rate)?|event|goal)/i,
-  page: /(of|from|for)(?<fp>(.+?))(page)/i,
-  referrer: /(of|from|for)(?<fp>(.+?))(referrer)/i,
-  utm_medium: /(of|from|for)(?<fp>(.+?))(medium)/i,
-  utm_source: /(of|from|for)(?<fp>(.+?))(utm source)/i,
-  utm_campaign: /(of|from|for)(?<fp>(.+?))(campaign)/i,
-  device: /(of|from|for|using)(?<fp>(.+?))(device)/i,
-  browser: /(of|from|for|using)(?<fp>(.+?))(browser)/i,
-  os: /(of|from|for|using)(?<fp>(.+?))(os|operating system)/i,
-  country: /(of|from|for)(?<fp>(.+?))(country)/i,
-  region: /(of|from|for)(?<fp>(.+?))(region)/i,
-  city: /(of|from|for)(?<fp>(.+?))(city)/i,
-  source: /(of|from|for)(?<fp>(.+?))(source|\s|\.|$)/i,
-
+  source: /(?<fp>(.+?))(source)/i, // prelist of keywords
   event_buy_now_click: /clicked (on )?buy(now )?/i,
   event_mint_click: /clicked (on )?mint(now )?/i,
   event_connect_wallet: /connected wallet|wallet connected/i,
@@ -76,31 +58,35 @@ const metricFilterRegexes = {
   event_minted: /minted/i,
 }
 
+const haveListAggregateRegex = /\bby\b/i
 const listAggregatorRegexes = {
-  visitors: /by visitors?/i,
-  visits: /by visits?/i,
-  pageviews: /by pageviews?/i,
-  bounce_rate: /by bounce/i,
-  events: /(by)(events)/i,
-
-  buy_now_click: /by buy now (events?|clicks?)/i,
-  mint_click: /by mint (events?|clicks?)/i,
-  connect_wallet: /by (wallet connects?|connected wallets?|wallets?)/i,
-  purchased: /by (bought|purchas(ed)?)/i,
-  minted: /by minted/i,
+  visitors: /visitors?/i,
+  visits: /visits?/i,
+  pageviews: /page\s?views?/i,
+  bounce_rate: /bounce rate/i,
+  events: /events?/i,
 }
 
 const durationRegex = /(today|yesterday|this week|this month|last week|last month|last year|past \d+ days|between \w+day and \w+day)/i
 
 const getDataTypePart = (message) => {
-  for (let pType in dataTypeRegexes) {
-    if (dataTypeRegexes[pType].test(message)) return pType;
+  if (listTypeRegex.test(message)) {
+    for (let pType in listRegex) {
+      if (listRegex[pType].test(message)) return ['breakdown', pType];
+    }
+  } else {
+    for (let pType in aggregateRegex) {
+      if (aggregateRegex[pType].test(message)) return ['aggregate', pType];
+    }
   }
+
+  return [null,null];
 }
+
 const getMetricFilterPart = (message) => {
   for (let pType in metricFilterRegexes) {
     if (metricFilterRegexes[pType].test(message)) {
-      const {groups: filterParam} = metricFilterRegexes[pType].exec(message);
+      const { groups: filterParam } = metricFilterRegexes[pType].exec(message);
       return {
         filterKey: pType,
         filterValue: filterParam?.fp.trim(),
@@ -117,7 +103,6 @@ const getListAggregatePart = (message) => {
   for (let pType in listAggregatorRegexes) {
     if (listAggregatorRegexes[pType].test(message)) return pType;
   }
-
   return null
 }
 
@@ -216,47 +201,49 @@ const capitilizeEveryWord = str => str.replace(/(^\w{1})|(\s+\w{1})/g, letter =>
 const capitilizeFirstWord = str => str.replace(/(^\w{1})/g, letter => letter.toUpperCase());
 
 export const parseUserStringFromRegexService = async (userMessage) => {
-  userMessage = userMessage.replace(/<\/span>/g,'')
-  const dataType = getDataTypePart(userMessage);
+  const [apiType, dataType] = getDataTypePart(userMessage);
+  console.log("🚀 ~ file: regexMatcherService.js:203 ~ parseUserStringFromRegexService ~ apiType, dataType:", apiType, dataType)
   const duration = getDurationPart(userMessage) ?? '6mo';
 
+  if (!dataType) return {}
+
   let reqBody = {};
-
-  if (dataType && dataType.includes('count')) {
-    reqBody["duration"] = duration;
-    reqBody["apiType"] = "aggregate";
-
-    reqBody["metric"] = metricsMap[dataType.replace('_count','')];
-    const {filterKey, filterValue} = getMetricFilterPart(userMessage);
-    if(filterKey && filterKey.includes('event_')) {
-      reqBody["filters"] = 
-        `event:name==${eventMap[filterKey.replace('event_','')]}`      
-    } else if(filterKey) {
-
-      reqBody["filters"] = 
-        `${propertiesMap[filterKey]}==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
-    }    
-  } else if (dataType && dataType.includes('list')) {
-    reqBody["duration"] = duration;
-    reqBody["apiType"] = "breakdown";
-
-    reqBody["property"] = propertiesMap[dataType.replace('_list','')];
-    const aggregateKey = getListAggregatePart(userMessage);
-    reqBody["metric"] = aggregateKey ?? 'visitors';
-
-    if([
-      'buy_now_click',
-      'mint_click',
-      'connect_wallet',
-      'purchased',
-      'minted',
-    ].includes(aggregateKey)) {
-      reqBody["metrics"] = 'events';
-      reqBody["filters"] = 'event:name=='+eventMap[aggregateKey];
+  reqBody["duration"] = duration;
+  reqBody["apiType"] = apiType;
+  if (apiType == "aggregate") {
+    reqBody["metric"] = metricsMap[dataType];
+    if (haveMetricFilterRegex.test(userMessage)) {
+      const { filterKey, filterValue } = getMetricFilterPart(userMessage);
+      if (filterKey && filterKey.includes('event_')) {
+        reqBody["filters"] =
+          `event:name==${eventMap[filterKey.replace('event_', '')]}`
+      } else if (filterKey) {
+        reqBody["filters"] =
+          // `${propertiesMap[filterKey]}==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
+          `source==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
+      }
     }
+  } else if (apiType == "breakdown") {
+    reqBody["property"] = propertiesMap[dataType];
+    const aggregateKey = getListAggregatePart(userMessage);
+    reqBody["metric"] = 'visitors';
 
+    if (haveListAggregateRegex.test(userMessage))
+      reqBody["metric"] = getListAggregatePart(userMessage) || 'visitors';
+
+    if (haveListAggregateRegex.test(userMessage) &&
+      [
+        'buy_now_click',
+        'mint_click',
+        'connect_wallet',
+        'purchased',
+        'minted',
+      ].includes(aggregateKey)) {
+      reqBody["metric "] = 'events';
+      reqBody["filters"] = 'event:name==' + eventMap[aggregateKey];
+    }
   }
-
+  console.log("🚀 ~ file: regexMatcherService.js:246 ~ parseUserStringFromRegexService ~ reqBody:", reqBody)
   return reqBody;
 };
 
@@ -266,4 +253,4 @@ export const parseUserStringFromRegexService = async (userMessage) => {
 // parseUserStringFromRegexService('what was traffic in last week')
 // parseUserStringFromRegexService('what is traffic in this week')
 // parseUserStringFromRegexService('give me visitors count for Minted event from this week')
-// parseUserStringFromRegexService(process.argv[2] ?? '')
+//  parseUserStringFromRegexService(process.argv[2] ?? '')
