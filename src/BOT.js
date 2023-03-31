@@ -15,7 +15,6 @@ import {
   renderAggregateResult,
 } from "./utils";
 import api from "./apiService";
-import { parseUserStringService } from "./openaiService";
 import { parseUserStringFromRegexService } from "./regexMatcherService";
 
 const MY_BOT = () => {
@@ -37,6 +36,11 @@ const MY_BOT = () => {
     const extractedBody = await parseUserStringFromRegexService(
       userMessage
     );
+
+    if (!Object.keys(extractedBody).length) {
+      showSuggestionMsg(null, msgStack);
+      return;
+    }
 
     let body =
       extractedBody.apiType === "aggregate"
@@ -98,7 +102,7 @@ const MY_BOT = () => {
       {
         message: msg
           ? msg
-          : "I did not understand your request.To get stats please write your message in this format.\n Give me conversion rate for mint events in last 7 days",
+          : `I'm sorry, I couldn't understand your query. Please try rephrasing your question or providing more context. Here are some examples of the kinds of questions you can ask me: \n - Give me visitor count from facebook in last week`,
         sentTime: new Date().toString(),
         sender: "Flolio",
       },

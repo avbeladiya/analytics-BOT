@@ -221,9 +221,9 @@ export const parseUserStringFromRegexService = async (userMessage) => {
   const duration = getDurationPart(userMessage) ?? '6mo';
 
   let reqBody = {};
-  reqBody["duration"] = duration;
 
-  if (dataType.includes('count')) {
+  if (dataType && dataType.includes('count')) {
+    reqBody["duration"] = duration;
     reqBody["apiType"] = "aggregate";
 
     reqBody["metric"] = metricsMap[dataType.replace('_count','')];
@@ -236,7 +236,8 @@ export const parseUserStringFromRegexService = async (userMessage) => {
       reqBody["filters"] = 
         `${propertiesMap[filterKey]}==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
     }    
-  } else if (dataType.includes('list')) {
+  } else if (dataType && dataType.includes('list')) {
+    reqBody["duration"] = duration;
     reqBody["apiType"] = "breakdown";
 
     reqBody["property"] = propertiesMap[dataType.replace('_list','')];
@@ -255,8 +256,6 @@ export const parseUserStringFromRegexService = async (userMessage) => {
     }
 
   }
-
-  console.log({reqBody});
 
   return reqBody;
 };

@@ -58,5 +58,6 @@ const testCases = [
 , "Show me a breakdown of events by source for last week."
 ]
 
+parseUserStringFromRegexService(process.argv[2] ?? '')
 
-console.log(testCases.map(tc => parseUserStringFromRegexService(tc)))
+// console.log(testCases.map(tc => parseUserStringFromRegexService(tc)))
