@@ -48,9 +48,9 @@ const listRegex = {
   country: /(countr(y|ies))/i,
 }
 
-const haveMetricFilterRegex = /\b(from|for)\b/i
+const haveMetricFilterRegex = /(from|for)/i
 const metricFilterRegexes = {
-  source: /(?<fp>(.+?))(source)/i, // prelist of keywords
+  source: /from (?<fp>(.+?))(source|\s|\.|$)/i, // prelist of keywords
   event_buy_now_click: /clicked (on )?buy(now )?/i,
   event_mint_click: /clicked (on )?mint(now )?/i,
   event_connect_wallet: /connected wallet|wallet connected/i,
@@ -219,15 +219,17 @@ export const parseUserStringFromRegexService = async (userMessage) => {
           `event:name==${eventMap[filterKey.replace('event_', '')]}`
       } else if (filterKey) {
         reqBody["filters"] =
-          // `${propertiesMap[filterKey]}==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
-          `source==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
+          `${propertiesMap[filterKey]}==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
+          // `source==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
       }
     }
   } else if (apiType == "breakdown") {
     reqBody["property"] = propertiesMap[dataType];
     const aggregateKey = getListAggregatePart(userMessage);
+    console.log("🚀 ~ file: regexMatcherService.js:229 ~ parseUserStringFromRegexService ~ aggregateKey:", aggregateKey)
     reqBody["metric"] = 'visitors';
 
+    console.log("🚀 ~ file: regexMatcherService.js:233 ~ parseUserStringFromRegexService ~ haveListAggregateRegex.test(userMessage):", haveListAggregateRegex.test(userMessage))
     if (haveListAggregateRegex.test(userMessage))
       reqBody["metric"] = getListAggregatePart(userMessage) || 'visitors';
 
