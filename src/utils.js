@@ -1,37 +1,4 @@
 import config from "./config";
-export function formatResp(apiType, data) {
-  switch (apiType) {
-    case "conversion_rate":
-      return data.map((item) => ({
-        key: item.source,
-        value: item.events ? item.events : item.visitors,
-      }));
-    case "top_pages":
-      return data.map((item) => ({ key: item.page, value: item.events }));
-    case "top_countries":
-      return data.map((item) => ({ key: item.country, value: item.visitors }));
-    case "bounce_rate":
-      return data.map((item) => ({
-        key: item.country,
-        value: item.bounce_rate,
-      }));
-    case "top_referrer":
-      return data.map((item) => ({ key: item.source, value: item.events }));
-    case "top_utms":
-      return data.map((item) => ({
-        key: item.utm_source,
-        value: item.visitors,
-      }));
-    case "pageviews":
-      return [{ key: "Page Views", value: data.pageviews.value }];
-    case "visitors":
-      return [{ key: "Visitors", value: data.visitors.value }];
-    case "devices":
-      return data.map((item) => ({ key: item.device, value: item.visitors }));
-    default:
-      break;
-  }
-}
 export function buildAPIQuery(body) {
   const finalQuery = new URLSearchParams({
     site_id: config.SITE_ID,

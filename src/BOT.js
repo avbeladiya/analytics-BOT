@@ -37,7 +37,6 @@ const MY_BOT = () => {
     const extractedBody = await parseUserStringFromRegexService(
       userMessage
     );
-    console.log("🚀 ~ file: BOT.js:40 ~ parseUserMessageFromInput ~ extractedBody:", extractedBody)
 
     let body =
       extractedBody.apiType === "aggregate"

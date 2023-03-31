@@ -33,44 +33,47 @@ const dataTypeRegexes = {
   visits_count: /((visit|impression)s? count|(count|number) of (visit|impression)s?)/i,
   pageviews_count: /((page view)s? count|(count|number) of (page view)s?)/i,
   bounce_rate_count: /((bounce)s? count|(count|number) of (bounce)s?)/i,
-  events_count: /((event)s? count|(count|number) of (event)s?)/i,
+  events_count: /((event)s? count|(count|number) of (event)s?|how many)/i,
 
   // Custom Count or aggregates
   // conversion_rate: /conversions/i
 
   // Lists or Breakdowns available
-  event_list: /(list of (events|goals))|((events|goals) list)/i,
-  page_list: /(list of pages?)|(pages? list)/i,
-  source_list: /(list of sources?)|(sources? list)/i,
-  referrer_list: /(list of referrers?)|(referrers? list)/i,
-  utm_medium_list: /(list of mediums?)|(mediums? list)/i,
-  utm_source_list: /(list of utm sources?)|(utm sources? list)/i,
-  utm_campaign_list: /(list of campaigns?)|(campaigns? list)/i,
-  device_list: /(list of devices?)|(devices? list)/i,
-  browser_list: /(list of browsers?)|(browsers? list)/i,
-  os_list: /(list of (os|operating systems?))|((os|operating systems?) list)/i,
-  country_list: /(list of countr(y|ies))|(countr(y|ies) list)/i,
-  region_list: /(list of regions?)|(regions? list)/i,
-  city_list: /(list of citys?)|(citys? list)/i,
-
-  // Custom List or breakdown
-  // event_conversions_list: /conversion rates|success rates|conversions? list/i,
+  event_list: /(list of (top |best )?(events|goals))|((conversions?|events|goals) list)/i,
+  page_list: /(list of (top |best )?pages?)|(pages? list)/i,
+  source_list: /(list of (top |best )?sources?)|(sources? list)/i,
+  referrer_list: /(list of (top |best )?referrers?)|(referrers? list)/i,
+  utm_medium_list: /(list of (top |best )?mediums?)|(mediums? list)/i,
+  utm_source_list: /(list of (top |best )?utm sources?)|(utm sources? list)/i,
+  utm_campaign_list: /(list of (top |best )?campaigns?)|(campaigns? list)/i,
+  device_list: /(list of (top |best )?devices?)|(devices? list)/i,
+  browser_list: /(list of (top |best )?browsers?)|(browsers? list)/i,
+  os_list: /(list of (top |best )?(os|operating systems?))|((os|operating systems?) list)/i,
+  country_list: /(list of (top |best )?countr(y|ies))|(countr(y|ies) list)/i,
+  region_list: /(list of (top |best )?regions?)|(regions? list)/i,
+  city_list: /(list of (top |best )?citys?)|(citys? list)/i,
 }
 
 const metricFilterRegexes = {
-  event: /(of|from|for)(?<fp>(.+?))(event|goal)/i,
+  event: /(of|from|for)(?<fp>(.+?))(conversion( rate)?|event|goal)/i,
   page: /(of|from|for)(?<fp>(.+?))(page)/i,
   referrer: /(of|from|for)(?<fp>(.+?))(referrer)/i,
   utm_medium: /(of|from|for)(?<fp>(.+?))(medium)/i,
   utm_source: /(of|from|for)(?<fp>(.+?))(utm source)/i,
   utm_campaign: /(of|from|for)(?<fp>(.+?))(campaign)/i,
-  device: /(of|from|for)(?<fp>(.+?))(device)/i,
-  browser: /(of|from|for)(?<fp>(.+?))(browser)/i,
-  os: /(of|from|for)(?<fp>(.+?))(os|operating system)/i,
+  device: /(of|from|for|using)(?<fp>(.+?))(device)/i,
+  browser: /(of|from|for|using)(?<fp>(.+?))(browser)/i,
+  os: /(of|from|for|using)(?<fp>(.+?))(os|operating system)/i,
   country: /(of|from|for)(?<fp>(.+?))(country)/i,
   region: /(of|from|for)(?<fp>(.+?))(region)/i,
   city: /(of|from|for)(?<fp>(.+?))(city)/i,
   source: /(of|from|for)(?<fp>(.+?))(source|\s|\.|$)/i,
+
+  event_buy_now_click: /clicked (on )?buy(now )?/i,
+  event_mint_click: /clicked (on )?mint(now )?/i,
+  event_connect_wallet: /connected wallet|wallet connected/i,
+  event_purchased: /purchased|bought/i,
+  event_minted: /minted/i,
 }
 
 const listAggregatorRegexes = {
@@ -97,10 +100,10 @@ const getDataTypePart = (message) => {
 const getMetricFilterPart = (message) => {
   for (let pType in metricFilterRegexes) {
     if (metricFilterRegexes[pType].test(message)) {
-      const {groups: {fp: filterParam}} = metricFilterRegexes[pType].exec(message);
+      const {groups: filterParam} = metricFilterRegexes[pType].exec(message);
       return {
         filterKey: pType,
-        filterValue: filterParam.trim(),
+        filterValue: filterParam?.fp.trim(),
       }
     }
   }
@@ -225,7 +228,10 @@ export const parseUserStringFromRegexService = async (userMessage) => {
 
     reqBody["metric"] = metricsMap[dataType.replace('_count','')];
     const {filterKey, filterValue} = getMetricFilterPart(userMessage);
-    if(filterKey) {
+    if(filterKey && filterKey.includes('event_')) {
+      reqBody["filters"] = 
+        `event:name==${eventMap[filterKey.replace('event_','')]}`      
+    } else if(filterKey) {
 
       reqBody["filters"] = 
         `${propertiesMap[filterKey]}==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
@@ -235,7 +241,7 @@ export const parseUserStringFromRegexService = async (userMessage) => {
 
     reqBody["property"] = propertiesMap[dataType.replace('_list','')];
     const aggregateKey = getListAggregatePart(userMessage);
-    reqBody["metrics"] = aggregateKey;
+    reqBody["metric"] = aggregateKey ?? 'visitors';
 
     if([
       'buy_now_click',
@@ -250,7 +256,7 @@ export const parseUserStringFromRegexService = async (userMessage) => {
 
   }
 
-  console.log(reqBody);
+  console.log({reqBody});
 
   return reqBody;
 };
