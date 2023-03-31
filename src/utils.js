@@ -68,7 +68,6 @@ export function renderBreakdownResult(odata) {
 export function renderAggregateResult(odata) {
   let data = {...odata}
   console.log("🚀 ~ file: utils.js:210 ~ renderAggregateResult ~ data:", data)
-  const ro = Object.entries(data.results);
-  console.log("🚀 ~ file: utils.js:212 ~ renderAggregateResult ~ ro:", ro)
+  const ro = Object.entries(data.results)[0];
   return `${ro[0]} - ${ro[1].value}`;
 }

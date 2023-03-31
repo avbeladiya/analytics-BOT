@@ -29,7 +29,7 @@ const propertiesMap = {
 }
 const dataTypeRegexes = {
   // Counts or aggregates
-  visitors_count: /(visitors? count|(count|number) of visitors)/i,
+  visitors_count: /(visitors? count|(count|number) of visitors|many (people |users )?visit(s|ed))/i,
   visits_count: /((visit|impression)s? count|(count|number) of (visit|impression)s?)/i,
   pageviews_count: /((page view)s? count|(count|number) of (page view)s?)/i,
   bounce_rate_count: /((bounce)s? count|(count|number) of (bounce)s?)/i,
@@ -60,10 +60,9 @@ const dataTypeRegexes = {
 const metricFilterRegexes = {
   event: /(of|from|for)(?<fp>(.+?))(event|goal)/i,
   page: /(of|from|for)(?<fp>(.+?))(page)/i,
-  source: /(of|from|for)(?<fp>(.+?))(source)/i,
   referrer: /(of|from|for)(?<fp>(.+?))(referrer)/i,
   utm_medium: /(of|from|for)(?<fp>(.+?))(medium)/i,
-  utm_source: /(of|from|for)(?<fp>(.+?))(source)/i,
+  utm_source: /(of|from|for)(?<fp>(.+?))(utm source)/i,
   utm_campaign: /(of|from|for)(?<fp>(.+?))(campaign)/i,
   device: /(of|from|for)(?<fp>(.+?))(device)/i,
   browser: /(of|from|for)(?<fp>(.+?))(browser)/i,
@@ -71,6 +70,7 @@ const metricFilterRegexes = {
   country: /(of|from|for)(?<fp>(.+?))(country)/i,
   region: /(of|from|for)(?<fp>(.+?))(region)/i,
   city: /(of|from|for)(?<fp>(.+?))(city)/i,
+  source: /(of|from|for)(?<fp>(.+?))(source|\s|\.|$)/i,
 }
 
 const listAggregatorRegexes = {
@@ -207,8 +207,13 @@ const parseDateDuration = (dateString) => {
   return `${startDate.toISOString().split("T")[0]},${endDate.toISOString().split("T")[0]}`
 };
 
+const uppercaseEveryWord = str => str.toUpperCase();
+const lowercaseEveryWord = str => str.toLowerCase();
+const capitilizeEveryWord = str => str.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
+const capitilizeFirstWord = str => str.replace(/(^\w{1})/g, letter => letter.toUpperCase());
 
 export const parseUserStringFromRegexService = async (userMessage) => {
+  userMessage = userMessage.replace(/<\/span>/g,'')
   const dataType = getDataTypePart(userMessage);
   const duration = getDurationPart(userMessage) ?? '6mo';
 
@@ -221,7 +226,9 @@ export const parseUserStringFromRegexService = async (userMessage) => {
     reqBody["metric"] = metricsMap[dataType.replace('_count','')];
     const {filterKey, filterValue} = getMetricFilterPart(userMessage);
     if(filterKey) {
-      reqBody["filters"] = `${propertiesMap[filterKey]}==${filterValue}`
+
+      reqBody["filters"] = 
+        `${propertiesMap[filterKey]}==${filterValue}|${uppercaseEveryWord(filterValue)}|${lowercaseEveryWord(filterValue)}|${capitilizeEveryWord(filterValue)}|${capitilizeFirstWord(filterValue)}`
     }    
   } else if (dataType.includes('list')) {
     reqBody["apiType"] = "breakdown";
@@ -249,8 +256,9 @@ export const parseUserStringFromRegexService = async (userMessage) => {
 };
 
 // parseUserStringFromRegexService('What were the page view count from twitter source')
-parseUserStringFromRegexService('list of events')
+// parseUserStringFromRegexService('list of events')
 // parseUserStringFromRegexService('give me visitors count for Minted events')
 // parseUserStringFromRegexService('what was traffic in last week')
 // parseUserStringFromRegexService('what is traffic in this week')
 // parseUserStringFromRegexService('give me visitors count for Minted event from this week')
+// parseUserStringFromRegexService(process.argv[2] ?? '')
