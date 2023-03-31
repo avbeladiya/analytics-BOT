@@ -202,7 +202,7 @@ const capitilizeFirstWord = str => str.replace(/(^\w{1})/g, letter => letter.toU
 
 export const parseUserStringFromRegexService = async (userMessage) => {
   const [apiType, dataType] = getDataTypePart(userMessage);
-  console.log("🚀 ~ file: regexMatcherService.js:203 ~ parseUserStringFromRegexService ~ apiType, dataType:", apiType, dataType)
+  // console.log("🚀 ~ file: regexMatcherService.js:203 ~ parseUserStringFromRegexService ~ apiType, dataType:", apiType, dataType)
   const duration = getDurationPart(userMessage) ?? '6mo';
 
   if (!dataType) return {}
@@ -226,10 +226,10 @@ export const parseUserStringFromRegexService = async (userMessage) => {
   } else if (apiType == "breakdown") {
     reqBody["property"] = propertiesMap[dataType];
     const aggregateKey = getListAggregatePart(userMessage);
-    console.log("🚀 ~ file: regexMatcherService.js:229 ~ parseUserStringFromRegexService ~ aggregateKey:", aggregateKey)
+    // console.log("🚀 ~ file: regexMatcherService.js:229 ~ parseUserStringFromRegexService ~ aggregateKey:", aggregateKey)
     reqBody["metric"] = 'visitors';
 
-    console.log("🚀 ~ file: regexMatcherService.js:233 ~ parseUserStringFromRegexService ~ haveListAggregateRegex.test(userMessage):", haveListAggregateRegex.test(userMessage))
+    // console.log("🚀 ~ file: regexMatcherService.js:233 ~ parseUserStringFromRegexService ~ haveListAggregateRegex.test(userMessage):", haveListAggregateRegex.test(userMessage))
     if (haveListAggregateRegex.test(userMessage))
       reqBody["metric"] = getListAggregatePart(userMessage) || 'visitors';
 
@@ -245,7 +245,7 @@ export const parseUserStringFromRegexService = async (userMessage) => {
       reqBody["filters"] = 'event:name==' + eventMap[aggregateKey];
     }
   }
-  console.log("🚀 ~ file: regexMatcherService.js:246 ~ parseUserStringFromRegexService ~ reqBody:", reqBody)
+  // console.log("🚀 ~ file: regexMatcherService.js:246 ~ parseUserStringFromRegexService ~ reqBody:", reqBody)
   return reqBody;
 };
 
