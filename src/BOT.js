@@ -9,13 +9,8 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 import { useState } from "preact/hooks";
 import config from "./config";
-import {
-  buildAPIQuery,
-  renderBreakdownResult,
-  renderAggregateResult,
-} from "./utils";
-import api from "./apiService";
-import { parseUserStringFromRegexService } from "./regexMatcherService";
+import { getPlausibleData, renderAggregateResult, renderBreakdownResult } from "./plausibleService"
+import { parseUserMessageWithRegex } from "./userMessageRegexParserService";
 
 const MY_BOT = () => {
   const [inputMessage, setInputMessage] = useState("");
@@ -31,52 +26,29 @@ const MY_BOT = () => {
   ]);
 
   async function parseUserMessageFromInput(userMessage, msgStack) {
-    // const extractedParams = await parseUserMessage(userMessage);
-
-    const extractedBody = await parseUserStringFromRegexService(
+    const parsedMessage = await parseUserMessageWithRegex(
       userMessage
     );
-    console.log("🚀 ~ file: BOT.js:39 ~ parseUserMessageFromInput ~ extractedBody:", extractedBody)
 
-    if (!Object.keys(extractedBody).length) {
+    if (!Object.keys(parsedMessage).length) {
       showSuggestionMsg(null, msgStack);
       return;
     }
 
-    let body =
-      extractedBody.apiType === "aggregate"
-        ? {
-            filters: extractedBody.filters,
-            metrics: extractedBody.metric,
-          }
-        : {
-            metrics: extractedBody.metric,
-            property: extractedBody.property,
-            filters: extractedBody.filters,
-          };
-
-      if(extractedBody.duration == '6mo') {
-        body['duration'] = extractedBody.duration
-      } else {
-        body['period'] = 'custom'
-        body['date'] =  extractedBody.duration
-      }
-
-    if (!Object.keys(body).length) {
-      showSuggestionMsg(null, msgStack);
-      return;
-    }
-
-    const urlPath = config.API_FILTER_PATH[extractedBody.apiType];
-
-    const res = await getAPIData(urlPath, body);
+    const res = await getPlausibleData({
+      baseUrl: config.BASE_URL,
+      apiToken: config.TOKEN,
+      siteId: config.SITE_ID,
+      queryParams: parsedMessage,
+      limit: config.DATA_LIMIT
+    });
     if (!res.results) {
       showSuggestionMsg(null, msgStack);
       return;
     }
 
     const formateResp =
-      extractedBody.apiType === "breakdown"
+      parsedMessage.apiType === "breakdown"
         ? renderBreakdownResult(res)
         : renderAggregateResult(res);
 
