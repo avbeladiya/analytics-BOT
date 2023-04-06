@@ -34,7 +34,7 @@ export function renderBreakdownResult(odata) {
       let roMetric = [...Object.entries(ro)[1]][0];
 
       // return `${roKey} - ${roVal} (${roMetric.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())})`;
-      return `${roKey} - ${roVal}`;
+      return `${roKey} - ${parseFloat(roVal).toLocaleString('en-US')}`;
     })
     .join("\n");
 }
@@ -42,5 +42,5 @@ export function renderAggregateResult(odata) {
   let data = {...odata}
   const ro = Object.entries(data.results)[0];
   // return `${ro[0]} - ${ro[1].value}`;
-  return `${ro[1].value}`;
+  return `${parseFloat(ro[1].value).toLocaleString('en-US')}`;
 }
